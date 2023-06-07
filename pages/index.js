@@ -69,7 +69,7 @@ const HomePage = () => {
                     <img
                       src={`https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`}
                       alt="Weather Icon"
-                      className="h-16 w-16 sm:h-24 sm:w-24 border-2 border-black rounded-xl bg-whiter align-middle self-center"
+                      className="h-16 w-16 sm:h-20 sm:w-20 border-2 border-black rounded-xl bg-whiter align-middle self-center"
                     />
                     <div className="flex flex-col justify-center">
                       <p className="text-3xl font-bold mb-0">{weatherData.name}</p>
@@ -77,7 +77,7 @@ const HomePage = () => {
                     </div>
                     <div className="flex justify-center  border-2 text-black border-black rounded-xl bg-whiter items-center">
                       <div className="flex mt-0 align-middle items-center flex-col ">
-                        <p className="text-xl px-2  sm:text-5xl align-middle">
+                        <p className="text-xl px-2  sm:text-3xl align-middle">
                           {convertTemperature(weatherData.main.temp)}&deg;{isCelsius ? 'C' : 'F'}
                         </p>
                         <button
