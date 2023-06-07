@@ -1,118 +1,135 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+import Header from '@/components/Header';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import WeatherCard from './WeatherCard';
+import Footer from '@/components/Footer';
 
-const inter = Inter({ subsets: ['latin'] })
+const API_KEY = '35913733e7f076a1cac136c1de270b7d';
 
-export default function Home() {
+const HomePage = () => {
+  const [weatherData, setWeatherData] = useState(null);
+  const [forecastData, setForecastData] = useState(null);
+  const [isCelsius, setIsCelsius] = useState(true);
+
+  const fetchWeatherData = async (city) => {
+    try {
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
+      );
+      setWeatherData(response.data);
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
+    }
+  };
+
+  const fetchForecastData = async (city) => {
+    try {
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`
+      );
+      setForecastData(response.data);
+    } catch (error) {
+      console.error('Error fetching forecast data:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (weatherData) {
+      fetchForecastData(weatherData.name);
+    }
+  }, [weatherData]);
+
+  const handleSubmit = async (city) => {
+    await fetchWeatherData(city);
+  };
+
+  const handleToggleUnits = () => {
+    setIsCelsius(!isCelsius);
+  };
+
+  const convertTemperature = (temp) => {
+    if (isCelsius) {
+      return Math.round(temp);
+    }
+    return Math.round((temp * 9) / 5 + 32);
+  };
+
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">pages/index.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+    <div className="flex w-full select-none justify-center min-h-screen">
+      <div className="container w-full content-center place-content-center flex justify-center flex-col place-items-center mx-auto px-4">
+        <Header onSubmit={handleSubmit} />
+
+        {weatherData && forecastData && (
+          <div className="mt-0 flex justify-center flex-col">
+            <div className="flex justify-center">
+              <div className="flex align-middle justify-center ">
+
+                <div className='flex justify-center flex-col align-middle'>
+                  <div className="flex flex-row border-2 justify-center border-black p-4 bg-primary text-whiter w-full gap-4 sm:gap-4 rounded-xl align-middle content-center">
+                    <img
+                      src={`https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`}
+                      alt="Weather Icon"
+                      className="h-16 w-16  sm:h-24 sm:w-24 border-2 border-black rounded-xl bg-whiter align-middle self-center"
+                    />
+                    <div className="flex flex-col justify-center">
+                      <p className="text-3xl font-bold mb-0">{weatherData.name}</p>
+                      <p className="text-xl text-center">{weatherData.weather[0].description}</p>
+                    </div>
+                    <div className="flex p-2 px-3 justify-center  border-2 text-black border-black rounded-xl bg-whiter items-center">
+                      <div className="flex align-middle items-center flex-col ">
+                        <p className="text-xl sm:text-5xl align-middle">
+                          {convertTemperature(weatherData.main.temp)}&deg;{isCelsius ? 'C' : 'F'}
+                        </p>
+                        <button
+                          className="text-primary text-sm font-semibold align-middle focus:outline-none"
+                          onClick={handleToggleUnits}
+                        >
+                          {isCelsius ? 'F' : 'C'}
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <div className=" border-2 place-items-center rounded-xl border-black font-bold p-4 justify-center grid-cols-2 grid gap-5">
+                    <p>Feels Like: {convertTemperature(weatherData.main.feels_like)}&deg;{isCelsius ? 'C' : 'F'}</p>
+                    <p>Humidity: {weatherData.main.humidity}%</p>
+                    {weatherData.sys && (
+                      <>
+                        <p>Sunrise: {new Date(weatherData.sys.sunrise * 1000).toLocaleTimeString('en-US')}</p>
+                        <p>Sunset: {new Date(weatherData.sys.sunset * 1000).toLocaleTimeString('en-US')}</p>
+                      </>
+                    )}
+                  </div>
+
+
+                </div>
+              </div>
+            </div>
+            <div className="mt-8 mb-10 grid gap-4 grid-cols-1 sm:grid-cols-5">
+              {forecastData.list.filter((item, index) => index % 8 === 0).map((item, index) => {
+                const date = new Date(item.dt_txt);
+                const day = date.toLocaleDateString('en-US', { weekday: 'short' });
+                const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                return (
+                  <WeatherCard
+                    key={index}
+                    day={day}
+                    date={dateString}
+                    icon={`https://openweathermap.org/img/w/${item.weather[0].icon}.png`}
+                    temp={convertTemperature(item.main.temp)}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
+        <Footer />
       </div>
+    </div>
+  );
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+};
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
-}
+export default HomePage;
