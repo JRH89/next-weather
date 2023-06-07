@@ -8,13 +8,12 @@ export default function Document() {
         <meta property="og:url" content="https://weather-pal.vercel.app/" />
         <meta property="og:title" content="Weather Pal" />
         <meta property="og:description" content="Weather app made with React, Next, and Tailwind." />
-        <meta property="og:image" content="https://jareds-portfolio.vercel.app/images/preview.png" />
+        <meta property="og:image" content="https://weather-pal.vercel.app/images/preview.png" />
         <meta property="url" content="https://weather-pal.vercel.app" />
         <meta property="title" content="Weather Pal" />
         <meta property="description" content="Weather app made with React, Next, and Tailwind." />
-        <meta property="image" content="https://jareds-portfolio.vercel.app/images/preview.png" />
+        <meta property="image" content="https://weather-pal/images/preview.png" />
         <link type="image/png" rel="shortcut icon" href="hookerhill.png" />
-
       </Head>
       <body>
         <Main />
