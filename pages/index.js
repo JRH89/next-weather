@@ -55,7 +55,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="flex w-full select-none justify-center min-h-screen">
+    <div className="flex text-center w-full select-none justify-center min-h-screen">
       <div className="container w-full content-center place-content-center flex justify-center flex-col place-items-center mx-auto px-4">
         <Header onSubmit={handleSubmit} />
 
@@ -65,19 +65,19 @@ const HomePage = () => {
               <div className="flex align-middle justify-center ">
 
                 <div className='flex justify-center flex-col align-middle'>
-                  <div className="flex flex-row border-2 justify-center border-black p-4 bg-primary text-whiter w-full gap-4 sm:gap-4 rounded-xl align-middle content-center">
+                  <div className="flex flex-row border-2 justify-evenly border-black p-2 bg-primary text-whiter w-full rounded-xl  align-middle content-center">
                     <img
                       src={`https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`}
                       alt="Weather Icon"
-                      className="h-16 w-16  sm:h-24 sm:w-24 border-2 border-black rounded-xl bg-whiter align-middle self-center"
+                      className="h-16 w-16 sm:h-24 sm:w-24 border-2 border-black rounded-xl bg-whiter align-middle self-center"
                     />
                     <div className="flex flex-col justify-center">
                       <p className="text-3xl font-bold mb-0">{weatherData.name}</p>
                       <p className="text-xl text-center">{weatherData.weather[0].description}</p>
                     </div>
-                    <div className="flex p-2 px-3 justify-center  border-2 text-black border-black rounded-xl bg-whiter items-center">
-                      <div className="flex align-middle items-center flex-col ">
-                        <p className="text-xl sm:text-5xl align-middle">
+                    <div className="flex justify-center  border-2 text-black border-black rounded-xl bg-whiter items-center">
+                      <div className="flex mt-0 align-middle items-center flex-col ">
+                        <p className="text-xl px-2  sm:text-5xl align-middle">
                           {convertTemperature(weatherData.main.temp)}&deg;{isCelsius ? 'C' : 'F'}
                         </p>
                         <button
@@ -106,7 +106,7 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-8 mb-10 grid gap-4 grid-cols-1 sm:grid-cols-5">
+            <div className="mt-8 mb-10 grid gap-4 grid-cols-2 text-center sm:grid-cols-5">
               {forecastData.list.filter((item, index) => index % 8 === 0).map((item, index) => {
                 const date = new Date(item.dt_txt);
                 const day = date.toLocaleDateString('en-US', { weekday: 'short' });
