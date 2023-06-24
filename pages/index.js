@@ -100,7 +100,7 @@ const Weather = () => {
                         {weatherData.weather[0].description}
                       </p>
                       <button
-                        className="text-primary underline text-slate-800 text-sm   justify-center flex font-semibold align-middle focus:outline-none"
+                        className="text-primary underline  mt-1 text-sm justify-center flex font-semibold align-middle focus:outline-none"
                         onClick={handleToggleUnits}
                       >
                         {isCelsius ? 'Imperial Units' : 'Metric Units'}
@@ -113,18 +113,18 @@ const Weather = () => {
                     </div>
                   </div>
                   <div className="align-middle  bg-white text-center opacity-75  place-items-center border-t-2 border-b-2 border-black rounded-xl text-black  font-bold p-4 justify-center grid-cols-2 grid gap-5">
-                    <p className='border-b-2 align-middle border-black rounded-xl p-1'>
+                    <p className='border-b-2 align-middle border-black rounded-xl px-2 p-1'>
                       Feels Like: {convertTemperature(weatherData.main.feels_like)}&deg;{isCelsius ? 'C' : 'F'}
                     </p>
-                    <p className='border-b-2 border-black rounded-xl p-1'>
+                    <p className='border-b-2 border-black rounded-xl p-1 px-2'>
                       Humidity: {weatherData.main.humidity}%
                     </p>
                     {weatherData.sys && (
                       <>
-                        <p className='border-b-2 border-black rounded-xl p-1'>
+                        <p className='border-b-2 border-black rounded-xl px-2 p-1'>
                           Sunrise: {new Date(weatherData.sys.sunrise * 1000).toLocaleTimeString('en-US')}
                         </p>
-                        <p className='border-b-2 border-black rounded-xl p-1'>
+                        <p className='border-b-2 border-black rounded-xl px-2 p-1'>
                           Sunset: {new Date(weatherData.sys.sunset * 1000).toLocaleTimeString('en-US')}
                         </p>
                       </>
