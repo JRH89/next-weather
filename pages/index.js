@@ -77,7 +77,9 @@ const Weather = () => {
       style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}
     >
       <div className="container content-center place-content-center  flex justify-center m-10 flex-col place-items-center my-auto mx-auto px-4">
-        <Header onSubmit={handleSubmit} />
+        <div className='w-auto flex justify-center'>
+          <Header onSubmit={handleSubmit} />
+        </div>
         {weatherData && forecastData && (
           <div className=" flex justify-center flex-col">
             <div className="flex justify-center">
