@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import WeatherCard from './WeatherCard'
 import Header from '@/components/Header'
-import Image from 'next/image'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const API_KEY = '35913733e7f076a1cac136c1de270b7d'
 
@@ -11,6 +12,7 @@ const Weather = () => {
   const [forecastData, setForecastData] = useState(null)
   const [isCelsius, setIsCelsius] = useState(false)
   const [backgroundImage, setBackgroundImage] = useState('')
+  const [forecastMode, setForecastMode] = useState('5day')
 
   const fetchWeatherData = async (city) => {
     try {
@@ -18,6 +20,7 @@ const Weather = () => {
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
       )
       setWeatherData(response.data)
+      saveFavoriteCity(city) // Save the city as a favorite
     } catch (error) {
       console.error('Error fetching weather data:', error)
     }
@@ -71,14 +74,42 @@ const Weather = () => {
     return Math.round((temp * 9) / 5 + 32)
   }
 
+  const saveFavoriteCity = (city) => {
+    localStorage.setItem('favoriteCity', city)
+  }
+
+  const handleSaveFavorite = () => {
+    const favoriteCity = weatherData.name
+    saveFavoriteCity(favoriteCity)
+    toast.success('Favorite city successfully set!',
+      {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 2000,
+
+      })
+  }
+
+  useEffect(() => {
+    const favoriteCity = localStorage.getItem('favoriteCity')
+    if (favoriteCity) {
+      fetchWeatherData(favoriteCity)
+    }
+  }, [fetchWeatherData])
+
   return (
     <div
       className="flex my-auto min-h-screen mx-auto text-center py-5 select-none justify-center"
       style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}
     >
       <div className="container content-center place-content-center  flex justify-center m-10 flex-col place-items-center my-auto mx-auto px-4">
-        <div className='w-auto flex justify-center'>
-          <Header onSubmit={handleSubmit} />
+        <div className='w-auto mb-2 flex justify-center'>
+          <Header
+            forecastMode={forecastMode}
+            setForecastMode={setForecastMode}
+            onSubmit={handleSubmit}
+            onToggleUnits={handleToggleUnits}
+            onSaveFavorite={handleSaveFavorite}
+          />
         </div>
         {weatherData && forecastData && (
           <div className=" flex justify-center flex-col">
@@ -102,11 +133,12 @@ const Weather = () => {
                         {weatherData.weather[0].description}
                       </p>
                       <button
-                        className="text-primary underline  mt-1 text-sm justify-center flex font-semibold align-middle focus:outline-none"
+                        className="text-primary underline  mt-1 text-sm justify-center flex font-semibold align-middle hover:opacity-60 hover:scale-90 duration-300 focus:outline-none"
                         onClick={handleToggleUnits}
                       >
                         {isCelsius ? 'Imperial Units' : 'Metric Units'}
                       </button>
+
                     </div>
                     <div className="flex justify-center bg-white items-center">
                       <p className="text-xl justify-center font-bold h-16 flex w-16 sm:h-20 sm:w-20 bg-black text-white rounded-xl py-5 px-2  sm:text-3xl align-middle">
@@ -135,25 +167,51 @@ const Weather = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-4 grid gap-1 grid-cols-2 justify-center align-middle place-content-center text-center sm:grid-cols-5">
-              {forecastData.list.filter((item, index) => index % 8 === 0).map((item, index) => {
-                const date = new Date(item.dt_txt)
-                const day = date.toLocaleDateString('en-US', { weekday: 'short' })
-                const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                return (
-                  <WeatherCard
-                    key={index}
-                    day={day}
-                    date={dateString}
-                    icon={`https://openweathermap.org/img/w/${item.weather[0].icon}.png`}
-                    temp={convertTemperature(item.main.temp)}
-                  />
-                )
-              })}
-            </div>
+            {forecastMode === '5day' ? (
+              <div className="mt-4 grid gap-1 grid-cols-2 justify-center align-middle place-content-center text-center sm:grid-cols-5">
+                {forecastData.list.filter((item, index) => index % 8 === 0).map((item, index) => {
+                  const date = new Date(item.dt_txt)
+                  const day = date.toLocaleDateString('en-US', { weekday: 'short' })
+                  const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                  return (
+                    <WeatherCard
+                      key={index}
+                      day={day}
+                      date={dateString}
+                      icon={`https://openweathermap.org/img/w/${item.weather[0].icon}.png`}
+                      temp={convertTemperature(item.main.temp)}
+                    />
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="mt-4 grid gap-1 justify-center align-middle place-content-center text-center grid-cols-3">
+                {forecastData.list.filter((item) => {
+                  const date = new Date(item.dt * 1000)
+                  const currentDate = new Date()
+                  return date.getDate() === currentDate.getDate() && date.getHours() >= currentDate.getHours()
+                }).map((item, index) => {
+                  const date = new Date(item.dt * 1000)
+                  const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' })
+                  const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                  return (
+                    <WeatherCard
+                      key={index}
+                      day={dateString}
+                      date={time}
+                      icon={`https://openweathermap.org/img/w/${item.weather[0].icon}.png`}
+                      temp={convertTemperature(item.main.temp)}
+                    />
+                  )
+                })}
+              </div>
+            )}
+
+
           </div>
         )}
       </div>
+      <ToastContainer />
     </div>
   )
 }
