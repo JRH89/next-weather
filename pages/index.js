@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import WeatherCard from './WeatherCard'
 import Header from '@/components/Header'
@@ -13,18 +13,18 @@ const Weather = () => {
   const [isCelsius, setIsCelsius] = useState(false)
   const [backgroundImage, setBackgroundImage] = useState('')
   const [forecastMode, setForecastMode] = useState('5day')
+  const [favoriteCity, setFavoriteCity] = useState('')
 
-  const fetchWeatherData = async (city) => {
+  const fetchWeatherData = useCallback(async (city) => {
     try {
       const response = await axios.get(
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
       )
       setWeatherData(response.data)
-      saveFavoriteCity(city) // Save the city as a favorite
     } catch (error) {
       console.error('Error fetching weather data:', error)
     }
-  }
+  }, [])
 
   const fetchForecastData = async (city) => {
     try {
@@ -36,6 +36,49 @@ const Weather = () => {
       console.error('Error fetching forecast data:', error)
     }
   }
+
+  const handleSubmit = async (city) => {
+    await fetchWeatherData(city)
+    fetchForecastData(city)
+  }
+
+  const handleToggleUnits = () => {
+    setIsCelsius(!isCelsius)
+  }
+
+  const convertTemperature = (temp) => {
+    if (isCelsius) {
+      return Math.round(temp)
+    }
+    return Math.round((temp * 9) / 5 + 32)
+  }
+
+  const saveFavoriteCity = (city) => {
+    setFavoriteCity(city)
+    localStorage.setItem('favoriteCity', city)
+  }
+
+  const handleSaveFavorite = () => {
+    const favoriteCity = weatherData.name
+    saveFavoriteCity(favoriteCity)
+    toast.success('Favorite city successfully set!', {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 2000,
+    })
+  }
+
+  useEffect(() => {
+    const storedFavoriteCity = localStorage.getItem('favoriteCity')
+    if (storedFavoriteCity) {
+      setFavoriteCity(storedFavoriteCity)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (favoriteCity) {
+      fetchWeatherData(favoriteCity)
+    }
+  }, [favoriteCity, fetchWeatherData])
 
   useEffect(() => {
     if (weatherData) {
@@ -58,44 +101,6 @@ const Weather = () => {
       fetchBackgroundImage()
     }
   }, [weatherData])
-
-  const handleSubmit = async (city) => {
-    await fetchWeatherData(city)
-  }
-
-  const handleToggleUnits = () => {
-    setIsCelsius(!isCelsius)
-  }
-
-  const convertTemperature = (temp) => {
-    if (isCelsius) {
-      return Math.round(temp)
-    }
-    return Math.round((temp * 9) / 5 + 32)
-  }
-
-  const saveFavoriteCity = (city) => {
-    localStorage.setItem('favoriteCity', city)
-  }
-
-  const handleSaveFavorite = () => {
-    const favoriteCity = weatherData.name
-    saveFavoriteCity(favoriteCity)
-    toast.success('Favorite city successfully set!',
-      {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 2000,
-
-      })
-  }
-
-  useEffect(() => {
-    const favoriteCity = localStorage.getItem('favoriteCity')
-    if (favoriteCity) {
-      fetchWeatherData(favoriteCity)
-    }
-  }, [fetchWeatherData])
-
   return (
     <div
       className="flex my-auto min-h-screen mx-auto text-center py-5 select-none justify-center"
