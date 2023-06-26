@@ -15,7 +15,7 @@ const Weather = () => {
   const [isCelsius, setIsCelsius] = useState(false)
   const [backgroundImage, setBackgroundImage] = useState('')
   const [forecastMode, setForecastMode] = useState('5day')
-  const [favoriteCity, setFavoriteCity] = useState('')
+  // const [favoriteCity, setFavoriteCity] = useState('')
 
   const fetchWeatherData = useCallback(async (city) => {
     try {
@@ -55,32 +55,28 @@ const Weather = () => {
     return Math.round((temp * 9) / 5 + 32)
   }
 
-  const saveFavoriteCity = (city) => {
-    setFavoriteCity(city)
-    localStorage.setItem('favoriteCity', city)
-  }
+  // const saveFavoriteCity = (city) => {
+  //   setFavoriteCity(city)
+  //   localStorage.setItem('favoriteCity', city)
+  // }
 
-  const handleSaveFavorite = () => {
-    const favoriteCity = weatherData.name
-    saveFavoriteCity(favoriteCity)
-    toast.success('Favorite city successfully set!', {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: 2000,
-    })
-  }
+  // const handleSaveFavorite = () => {
+  //   const favoriteCity = weatherData.name
+  //   saveFavoriteCity(favoriteCity)
+  //   toast.success('Favorite city successfully set!', {
+  //     position: toast.POSITION.TOP_RIGHT,
+  //     autoClose: 2000,
+  //   })
+  // }
 
-  useEffect(() => {
-    const storedFavoriteCity = localStorage.getItem('favoriteCity')
-    if (storedFavoriteCity) {
-      setFavoriteCity(storedFavoriteCity)
-    }
-  }, [])
+  // useEffect(() => {
+  //   const storedFavoriteCity = localStorage.getItem('favoriteCity')
+  //   if (storedFavoriteCity) {
+  //     setFavoriteCity(storedFavoriteCity)
+  //   }
+  // }, [])
 
-  useEffect(() => {
-    if (favoriteCity) {
-      fetchWeatherData(favoriteCity)
-    }
-  }, [favoriteCity, fetchWeatherData])
+
 
   useEffect(() => {
     if (weatherData) {
@@ -115,7 +111,7 @@ const Weather = () => {
             setForecastMode={setForecastMode}
             onSubmit={handleSubmit}
             onToggleUnits={handleToggleUnits}
-            onSaveFavorite={handleSaveFavorite}
+
           />
         </div>
         {weatherData && forecastData && (
