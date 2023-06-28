@@ -14,6 +14,10 @@ module.exports = {
       borderRadius: {
         xl: '1.5rem',
       },
+      screens: {
+        xsmall: { max: "360px" },
+        big: { max: "800" },
+      },
     },
   },
   variants: {

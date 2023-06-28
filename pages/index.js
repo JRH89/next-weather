@@ -15,12 +15,11 @@ const Weather = () => {
   const [isCelsius, setIsCelsius] = useState(false)
   const [backgroundImage, setBackgroundImage] = useState('')
   const [forecastMode, setForecastMode] = useState('5day')
-  // const [favoriteCity, setFavoriteCity] = useState('')
 
   const fetchWeatherData = useCallback(async (city) => {
     try {
       const response = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${API_KEY}`
       )
       setWeatherData(response.data)
     } catch (error) {
@@ -31,7 +30,7 @@ const Weather = () => {
   const fetchForecastData = async (city) => {
     try {
       const response = await axios.get(
-        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=imperial&appid=${API_KEY}`
       )
       setForecastData(response.data)
     } catch (error) {
@@ -49,34 +48,11 @@ const Weather = () => {
   }
 
   const convertTemperature = (temp) => {
-    if (isCelsius) {
+    if (!isCelsius) {
       return Math.round(temp)
     }
-    return Math.round((temp * 9) / 5 + 32)
+    return Math.round((temp / 9) * 5 - 32)
   }
-
-  // const saveFavoriteCity = (city) => {
-  //   setFavoriteCity(city)
-  //   localStorage.setItem('favoriteCity', city)
-  // }
-
-  // const handleSaveFavorite = () => {
-  //   const favoriteCity = weatherData.name
-  //   saveFavoriteCity(favoriteCity)
-  //   toast.success('Favorite city successfully set!', {
-  //     position: toast.POSITION.TOP_RIGHT,
-  //     autoClose: 2000,
-  //   })
-  // }
-
-  // useEffect(() => {
-  //   const storedFavoriteCity = localStorage.getItem('favoriteCity')
-  //   if (storedFavoriteCity) {
-  //     setFavoriteCity(storedFavoriteCity)
-  //   }
-  // }, [])
-
-
 
   useEffect(() => {
     if (weatherData) {
@@ -111,6 +87,8 @@ const Weather = () => {
             setForecastMode={setForecastMode}
             onSubmit={handleSubmit}
             onToggleUnits={handleToggleUnits}
+            setIsCelsius={setIsCelsius}
+            isCelsius={isCelsius}
 
           />
         </div>
@@ -125,31 +103,28 @@ const Weather = () => {
                       height={20}
                       src={`https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`}
                       alt="Weather Icon"
-                      className="h-16 flex w-16 sm:h-20 sm:w-20   
+                      className="h-16 xsmall:h-10 xsmall:w-10 flex w-16 sm:h-20 sm:w-20  xsmall:rounded-lg 
 											 rounded-xl bg-black align-middle self-center"
                     />
                     <div className="flex flex-col justify-center">
-                      <p className="text-3xl font-bold mb-0">
+                      <p className="text-3xl xsmall:text-lg font-bold mb-0">
                         {weatherData.name}
                       </p>
-                      <p className="text-xl italic font-bold text-center">
+                      <p className="text-xl italic font-bold xsmall:text-xs text-center">
                         {weatherData.weather[0].description}
                       </p>
-                      <button
-                        className="text-primary underline  mt-1 text-sm justify-center flex font-semibold align-middle hover:opacity-60 hover:scale-90 duration-300 focus:outline-none"
-                        onClick={handleToggleUnits}
-                      >
-                        {isCelsius ? 'Imperial Units' : 'Metric Units'}
-                      </button>
 
                     </div>
                     <div className="flex justify-center bg-white items-center">
-                      <p className="text-xl justify-center font-bold h-16 flex w-16 sm:h-20 sm:w-20 bg-black text-white rounded-xl py-5 px-2  sm:text-3xl align-middle">
+                      <p className={`text-xl justify-center font-bold h-16 flex w-16 sm:h-20 xsmall:h-10 xsmall:w-10 sm:w-20 bg-black  rounded-xl py-5 px-2 xsmall:py-3 xsmall:rounded-lg xsmall:text-xs sm:text-3xl align-middle ${weatherData.main.temp < 50 ? 'text-blue-900 ' :
+                        weatherData.main.temp >= 50 && weatherData.main.temp < 70 ? 'text-blue-400 ' :
+                          weatherData.main.temp >= 70 && weatherData.main.temp < 90 ? 'text-orange-500 ' :
+                            'text-red-800 '}`}>
                         {convertTemperature(weatherData.main.temp)}&deg;{isCelsius ? 'C' : 'F'}
                       </p>
                     </div>
                   </div>
-                  <div className="align-middle  bg-white text-center opacity-75  place-items-center border-t-2 border-b-2 border-black rounded-xl text-black  font-bold p-4 justify-center grid-cols-2 grid gap-5">
+                  <div className="align-middle  bg-white text-center opacity-75  place-items-center border-t-2 border-b-2 border-black xsmall:text-xs rounded-xl text-black  font-bold p-4 justify-center grid-cols-2 grid gap-5">
                     <p className='border-b-2 align-middle border-black rounded-xl px-2 p-1'>
                       Feels Like: {convertTemperature(weatherData.main.feels_like)}&deg;{isCelsius ? 'C' : 'F'}
                     </p>
@@ -159,10 +134,10 @@ const Weather = () => {
                     {weatherData.sys && (
                       <>
                         <p className='border-b-2 border-black rounded-xl px-2 p-1'>
-                          Sunrise: {new Date(weatherData.sys.sunrise * 1000).toLocaleTimeString('en-US')}
+                          Sunrise: {new Date(weatherData.sys.sunrise * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' })}
                         </p>
                         <p className='border-b-2 border-black rounded-xl px-2 p-1'>
-                          Sunset: {new Date(weatherData.sys.sunset * 1000).toLocaleTimeString('en-US')}
+                          Sunset: {new Date(weatherData.sys.sunset * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' })}
                         </p>
                       </>
                     )}
@@ -188,11 +163,17 @@ const Weather = () => {
                 })}
               </div>
             ) : (
-              <div className="mt-4 grid gap-1 justify-center align-middle place-content-center text-center grid-cols-3">
-                {forecastData.list.filter((item) => {
+              <div className="mt-4 grid gap-1 justify-center align-middle grid-cols-2 place-content-center text-center sm:grid-cols-5">
+                {forecastData.list.filter((item, index) => {
                   const date = new Date(item.dt * 1000)
                   const currentDate = new Date()
-                  return date.getDate() === currentDate.getDate() && date.getHours() >= currentDate.getHours()
+                  const forecastDateTime = date.getTime()
+                  const currentDateTime = currentDate.getTime()
+
+                  return (
+                    forecastDateTime >= currentDateTime &&
+                    index < 5
+                  )
                 }).map((item, index) => {
                   const date = new Date(item.dt * 1000)
                   const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' })
@@ -209,8 +190,6 @@ const Weather = () => {
                 })}
               </div>
             )}
-
-
           </div>
         )}
       </div>
