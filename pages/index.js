@@ -77,8 +77,8 @@ const Weather = () => {
   }, [weatherData])
   return (
     <div
-      className="flex my-auto min-h-screen mx-auto text-center py-5 select-none justify-center"
-      style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}
+      className="flex my-auto min-h-screen mx-auto text-center py-5 select-none justify-center bg-sky-950"
+    // style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}
     >
       <div className="container content-center place-content-center  flex justify-center m-10 flex-col place-items-center my-auto mx-auto px-4">
         <div className='w-auto mb-2 flex justify-center'>
