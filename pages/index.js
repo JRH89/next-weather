@@ -4,8 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import WeatherCard from './WeatherCard'
 import Header from '@/components/Header'
-import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 
 const API_KEY = '35913733e7f076a1cac136c1de270b7d'
 
@@ -51,7 +49,7 @@ const Weather = () => {
     if (!isCelsius) {
       return Math.round(temp)
     }
-    return Math.round((temp / 9) * 5 - 32)
+    return Math.round((temp - 32) * 5 / 9)
   }
 
   useEffect(() => {
@@ -193,7 +191,6 @@ const Weather = () => {
           </div>
         )}
       </div>
-      <ToastContainer />
     </div>
   )
 }

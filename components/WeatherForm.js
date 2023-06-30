@@ -1,5 +1,3 @@
-// components/WeatherForm.js
-
 import React, { useState } from 'react'
 
 const WeatherForm = ({ onSubmit }) => {
